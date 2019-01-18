@@ -12,6 +12,8 @@ const multer = require('multer');
 const config = require('./config/config.js');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
+const shopController = require('./controllers/shop');
+const isAuth = require('./middleware/is-auth');
 
 const app = express();
 const store = new MongoDBStore({
@@ -61,7 +63,7 @@ app.use(
     store: store
   }));
 
-app.use(csrfProtection);
+
 app.use(flash());
 
 app.use((req, res, next) => {
@@ -83,9 +85,18 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
+  next();
+});
+
+//After csrfProtection because this is managed by stripe
+app.post('/create-order', isAuth, shopController.postOrder);
+
+app.use(csrfProtection);
+app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   next();
 });
+
 app.use('/admin', adminRoutes);
 
 app.use('/admin', adminRoutes);
