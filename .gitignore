@@ -1,6 +1,5 @@
 #Ignore config files
-config/
-config/config.js
+config/config-dev.js
 
 #ignore node modules
 node_modules/
